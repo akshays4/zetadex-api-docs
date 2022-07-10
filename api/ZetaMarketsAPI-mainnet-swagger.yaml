@@ -1,568 +1,404 @@
-{
-  "swagger" : "2.0",
-  "info" : {
-    "description" : "Main Zeta Markets API",
-    "version" : "4",
-    "title" : "ZetaMarketsAPI"
-  },
-  "host" : "api.zeta.markets",
-  "schemes" : [ "https" ],
-  "paths" : {
-    "/account/{pubkey}/trades" : {
-      "get" : {
-        "description" : "Returns an object with keys 'trades' (list of trades), 'market_index' (integer)",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "market",
-          "in" : "query",
-          "description" : "Market index [integer], do not include for all markets.",
-          "required" : false,
-          "type" : "string"
-        }, {
-          "name" : "pubkey",
-          "in" : "path",
-          "required" : true,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/Empty"
-            }
-          }
-        },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-AccountTrades/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      }
-    },
-    "/global/stats/leaderboard" : {
-      "get" : {
-        "description" : "Returns an object with leaderboard rank as keys",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "start",
-          "in" : "query",
-          "description" : "Initial rank [integer]",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "leaderboard",
-          "in" : "query",
-          "description" : "Leaderboard type of form leaderboard_<24h,7d,30d>_<diff,ratio> e.g. leaderboard_24h_diff, leaderboard_7d_ratio, leaderboard_30d_diff [string]",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "end",
-          "in" : "query",
-          "description" : "Final leaderboard rank [integer]",
-          "required" : true,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/Empty"
-            }
-          }
-        },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-Leaderboard/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      }
-    },
-    "/global/stats/pnl" : {
-      "get" : {
-        "description" : "Returns pnl data for pubkey",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "pubkey",
-          "in" : "query",
-          "description" : "Public Key of account to query",
-          "required" : true,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/Empty"
-            }
-          }
-        },
-        "x-amazon-apigateway-request-validator" : "Validate query string parameters and headers",
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-Pnl/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      }
-    },
-    "/markets/{market}" : {
-      "get" : {
-        "description" : "Returns object with key in the form: <underlying>#<expiry_timestamp>#<type>#<strike>, e.g. SOL#1657872000#put#38.0 open interest and last updated timestamp as values",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "expiry",
-          "in" : "query",
-          "description" : "Expiry unix timestamp(s) (can include many if required e.g. '1657872000,1657267200' or '1657872000'",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "strike",
-          "in" : "query",
-          "description" : "Strike price to 1 decimal place e.g. 38.0 or 0.0",
-          "required" : false,
-          "type" : "string"
-        }, {
-          "name" : "market",
-          "in" : "path",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "type",
-          "in" : "query",
-          "description" : "Type of market index e.g. 'put', 'call', 'future'",
-          "required" : false,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/Empty"
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-MarketData/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      }
-    },
-    "/markets/{market}/stats" : {
-      "get" : {
-        "description" : "Returns 24h volume, premium sums, trades, notional volume, total open interest, put to call ratio and last updated timestamp.",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "market",
-          "in" : "path",
-          "required" : true,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200 response",
-            "schema" : {
-              "$ref" : "#/definitions/Empty"
-            }
-          }
-        },
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-TotalMarketData/invocations",
-          "responses" : {
-            "default" : {
-              "statusCode" : "200"
-            }
-          },
-          "passthroughBehavior" : "when_no_match",
-          "contentHandling" : "CONVERT_TO_TEXT",
-          "type" : "aws_proxy"
-        }
-      }
-    }
-  },
-  "definitions" : {
-    "Empty" : {
-      "type" : "object",
-      "title" : "Empty Schema"
-    }
-  },
-  "x-amazon-apigateway-documentation" : {
-    "version" : "4",
-    "createdDate" : "2022-07-10T10:09:09Z",
-    "documentationParts" : [ {
-      "location" : {
-        "type" : "API"
-      },
-      "properties" : {
-        "info" : {
-          "description" : "Main Zeta Markets API"
-        }
-      }
-    }, {
-      "location" : {
-        "type" : "METHOD",
-        "path" : "/account/{pubkey}/trades",
-        "method" : "GET"
-      },
-      "properties" : {
-        "description" : "Returns an object with keys 'trades' (list of trades), 'market_index' (integer)"
-      }
-    }, {
-      "location" : {
-        "type" : "METHOD",
-        "path" : "/global/stats/leaderboard",
-        "method" : "GET"
-      },
-      "properties" : {
-        "description" : "Returns an object with leaderboard rank as keys"
-      }
-    }, {
-      "location" : {
-        "type" : "METHOD",
-        "path" : "/global/stats/pnl",
-        "method" : "GET"
-      },
-      "properties" : {
-        "description" : "Returns pnl data for pubkey"
-      }
-    }, {
-      "location" : {
-        "type" : "METHOD",
-        "path" : "/markets/{market}/stats",
-        "method" : "GET"
-      },
-      "properties" : {
-        "description" : "Returns 24h volume, premium sums, trades, notional volume, total open interest, put to call ratio and last updated timestamp."
-      }
-    }, {
-      "location" : {
-        "type" : "METHOD",
-        "path" : "/markets/{market}",
-        "method" : "GET"
-      },
-      "properties" : {
-        "description" : "Returns object with key in the form of <underlying>#<expiry_timestamp>#<type>#<strike>, e.g. SOL#1657872000#put#38.0 open interest and last updated timestamp as values"
-      }
-    }, {
-      "location" : {
-        "type" : "MODEL",
-        "name" : "Empty"
-      },
-      "properties" : {
-        "title" : "Empty Schema"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/global/stats/leaderboard",
-        "method" : "GET",
-        "name" : "end"
-      },
-      "properties" : {
-        "description" : "Final leaderboard rank [integer]"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/markets/{market}",
-        "method" : "GET",
-        "name" : "expiry"
-      },
-      "properties" : {
-        "description" : "Expiry unix timestamp(s) (can include many if required e.g. '1657872000,1657267200' or '1657872000'"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/global/stats/leaderboard",
-        "method" : "GET",
-        "name" : "leaderboard"
-      },
-      "properties" : {
-        "description" : "Leaderboard type of form leaderboard_<24h,7d,30d>_<diff,ratio> e.g. leaderboard_24h_diff, leaderboard_7d_ratio, leaderboard_30d_diff [string]"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/account/{pubkey}/trades",
-        "method" : "GET",
-        "name" : "market"
-      },
-      "properties" : {
-        "description" : "Market index [integer], do not include for all markets."
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/global/stats/pnl",
-        "method" : "GET",
-        "name" : "pubkey"
-      },
-      "properties" : {
-        "description" : "Public Key of account to query"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/global/stats/leaderboard",
-        "method" : "GET",
-        "name" : "start"
-      },
-      "properties" : {
-        "description" : "Initial rank [integer]"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/markets/{market}",
-        "method" : "GET",
-        "name" : "strike"
-      },
-      "properties" : {
-        "description" : "Strike price to 1 decimal place e.g. 38.0 or 0.0"
-      }
-    }, {
-      "location" : {
-        "type" : "QUERY_PARAMETER",
-        "path" : "/markets/{market}",
-        "method" : "GET",
-        "name" : "type"
-      },
-      "properties" : {
-        "description" : "Type of market index e.g. 'put', 'call', 'future'"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/account/{pubkey}/trades"
-      },
-      "properties" : {
-        "description" : "The most recent 50 trades in all markets or one specific market index"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/account/{pubkey}"
-      },
-      "properties" : {
-        "description" : "Public key of user to query"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/account"
-      },
-      "properties" : {
-        "description" : "Individual user information"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/global/stats/leaderboard"
-      },
-      "properties" : {
-        "description" : "Leaderboards for users in range <start> to <end>"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/global/stats/pnl"
-      },
-      "properties" : {
-        "description" : "PnL for individual account by pubkey"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/global/stats"
-      },
-      "properties" : {
-        "description" : "Global platform stats"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/global"
-      },
-      "properties" : {
-        "description" : "Zetadex global resources"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/markets/{market}/stats"
-      },
-      "properties" : {
-        "description" : "Markets stats return 24h stats for market specified in path paramter"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/markets/{market}"
-      },
-      "properties" : {
-        "description" : "Market to query e.g. 'SOL-USD'"
-      }
-    }, {
-      "location" : {
-        "type" : "RESOURCE",
-        "path" : "/markets"
-      },
-      "properties" : {
-        "description" : "Current zetadex market data"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/account/{pubkey}/trades",
-        "method" : "GET",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/account/{pubkey}/trades",
-        "method" : "OPTIONS",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/global/stats/leaderboard",
-        "method" : "GET",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/global/stats/leaderboard",
-        "method" : "OPTIONS",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/global/stats/pnl",
-        "method" : "GET",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/global/stats/pnl",
-        "method" : "OPTIONS",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/markets/{market}/stats",
-        "method" : "GET",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/markets/{market}/stats",
-        "method" : "OPTIONS",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/markets/{market}",
-        "method" : "GET",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    }, {
-      "location" : {
-        "type" : "RESPONSE",
-        "path" : "/markets/{market}",
-        "method" : "OPTIONS",
-        "statusCode" : "200"
-      },
-      "properties" : {
-        "description" : "200 response"
-      }
-    } ]
-  },
-  "x-amazon-apigateway-gateway-responses" : {
-    "DEFAULT_4XX" : {
-      "responseParameters" : {
-        "gatewayresponse.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
-        "gatewayresponse.header.Access-Control-Allow-Origin" : "'*'",
-        "gatewayresponse.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      }
-    },
-    "DEFAULT_5XX" : {
-      "responseParameters" : {
-        "gatewayresponse.header.Access-Control-Allow-Methods" : "'OPTIONS,POST'",
-        "gatewayresponse.header.Access-Control-Allow-Origin" : "'*'",
-        "gatewayresponse.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      }
-    }
-  },
-  "x-amazon-apigateway-request-validators" : {
-    "Validate query string parameters and headers" : {
-      "validateRequestParameters" : true,
-      "validateRequestBody" : false
-    }
-  }
-}
+---
+swagger: "2.0"
+info:
+  description: Main Zeta Markets API
+  version: "4"
+  title: ZetaMarketsAPI
+host: api.zeta.markets
+schemes:
+- https
+paths:
+  /account/{pubkey}/trades:
+    get:
+      description: "Returns an object with keys 'trades' (list of trades), 'market_index' (integer)"
+      produces:
+      - application/json
+      parameters:
+      - name: market
+        in: query
+        description: "Market index [integer], do not include for all markets."
+        required: false
+        type: string
+      - name: pubkey
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-amazon-apigateway-request-validator: Validate query string parameters and headers
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-AccountTrades/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+  /global/stats/leaderboard:
+    get:
+      description: Returns an object with leaderboard rank as keys
+      produces:
+      - application/json
+      parameters:
+      - name: start
+        in: query
+        description: "Initial rank [integer]"
+        required: true
+        type: string
+      - name: leaderboard
+        in: query
+        description: "Leaderboard type of form leaderboard_<24h,7d,30d>_<diff,ratio> e.g. leaderboard_24h_diff, leaderboard_7d_ratio, leaderboard_30d_diff [string]"
+        required: true
+        type: string
+      - name: end
+        in: query
+        description: "Final leaderboard rank [integer]"
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-amazon-apigateway-request-validator: Validate query string parameters and headers
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-Leaderboard/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+  /global/stats/pnl:
+    get:
+      description: Returns pnl data for pubkey
+      produces:
+      - application/json
+      parameters:
+      - name: pubkey
+        in: query
+        description: Public Key of account to query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-amazon-apigateway-request-validator: Validate query string parameters and headers
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-Pnl/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+  /markets/{market}:
+    get:
+      description: "Returns object with key in the form: <underlying>#<expiry_timestamp>#<type>#<strike>, e.g. SOL#1657872000#put#38.0 open interest and last updated timestamp as values"
+      produces:
+      - application/json
+      parameters:
+      - name: expiry
+        in: query
+        description: "Expiry unix timestamp(s) (can include many if required e.g. '1657872000,1657267200' or '1657872000'"
+        required: true
+        type: string
+      - name: strike
+        in: query
+        description: Strike price to 1 decimal place e.g. 38.0 or 0.0
+        required: false
+        type: string
+      - name: market
+        in: path
+        required: true
+        type: string
+      - name: type
+        in: query
+        description: "Type of market index e.g. 'put', 'call', 'future'"
+        required: false
+        type: string
+      responses:
+        "200":
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-MarketData/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+  /markets/{market}/stats:
+    get:
+      description: "Returns 24h volume, premium sums, trades, notional volume, total open interest, put to call ratio and last updated timestamp."
+      produces:
+      - application/json
+      parameters:
+      - name: market
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:840153641671:function:API-TotalMarketData/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
+definitions:
+  Empty:
+    type: object
+    title: Empty Schema
+x-amazon-apigateway-documentation:
+  version: "4"
+  createdDate: 2022-07-10T10:09:09Z
+  documentationParts:
+  - location:
+      type: API
+    properties:
+      info:
+        description: Main Zeta Markets API
+  - location:
+      type: METHOD
+      path: "/account/{pubkey}/trades"
+      method: GET
+    properties:
+      description: "Returns an object with keys 'trades' (list of trades), 'market_index' (integer)"
+  - location:
+      type: METHOD
+      path: /global/stats/leaderboard
+      method: GET
+    properties:
+      description: Returns an object with leaderboard rank as keys
+  - location:
+      type: METHOD
+      path: /global/stats/pnl
+      method: GET
+    properties:
+      description: Returns pnl data for pubkey
+  - location:
+      type: METHOD
+      path: "/markets/{market}/stats"
+      method: GET
+    properties:
+      description: "Returns 24h volume, premium sums, trades, notional volume, total open interest, put to call ratio and last updated timestamp."
+  - location:
+      type: METHOD
+      path: "/markets/{market}"
+      method: GET
+    properties:
+      description: "Returns object with key in the form of <underlying>#<expiry_timestamp>#<type>#<strike>, e.g. SOL#1657872000#put#38.0 open interest and last updated timestamp as values"
+  - location:
+      type: MODEL
+      name: Empty
+    properties:
+      title: Empty Schema
+  - location:
+      type: QUERY_PARAMETER
+      path: /global/stats/leaderboard
+      method: GET
+      name: end
+    properties:
+      description: "Final leaderboard rank [integer]"
+  - location:
+      type: QUERY_PARAMETER
+      path: "/markets/{market}"
+      method: GET
+      name: expiry
+    properties:
+      description: "Expiry unix timestamp(s) (can include many if required e.g. '1657872000,1657267200' or '1657872000'"
+  - location:
+      type: QUERY_PARAMETER
+      path: /global/stats/leaderboard
+      method: GET
+      name: leaderboard
+    properties:
+      description: "Leaderboard type of form leaderboard_<24h,7d,30d>_<diff,ratio> e.g. leaderboard_24h_diff, leaderboard_7d_ratio, leaderboard_30d_diff [string]"
+  - location:
+      type: QUERY_PARAMETER
+      path: "/account/{pubkey}/trades"
+      method: GET
+      name: market
+    properties:
+      description: "Market index [integer], do not include for all markets."
+  - location:
+      type: QUERY_PARAMETER
+      path: /global/stats/pnl
+      method: GET
+      name: pubkey
+    properties:
+      description: Public Key of account to query
+  - location:
+      type: QUERY_PARAMETER
+      path: /global/stats/leaderboard
+      method: GET
+      name: start
+    properties:
+      description: "Initial rank [integer]"
+  - location:
+      type: QUERY_PARAMETER
+      path: "/markets/{market}"
+      method: GET
+      name: strike
+    properties:
+      description: Strike price to 1 decimal place e.g. 38.0 or 0.0
+  - location:
+      type: QUERY_PARAMETER
+      path: "/markets/{market}"
+      method: GET
+      name: type
+    properties:
+      description: "Type of market index e.g. 'put', 'call', 'future'"
+  - location:
+      type: RESOURCE
+      path: "/account/{pubkey}/trades"
+    properties:
+      description: The most recent 50 trades in all markets or one specific market index
+  - location:
+      type: RESOURCE
+      path: "/account/{pubkey}"
+    properties:
+      description: Public key of user to query
+  - location:
+      type: RESOURCE
+      path: /account
+    properties:
+      description: Individual user information
+  - location:
+      type: RESOURCE
+      path: /global/stats/leaderboard
+    properties:
+      description: Leaderboards for users in range <start> to <end>
+  - location:
+      type: RESOURCE
+      path: /global/stats/pnl
+    properties:
+      description: PnL for individual account by pubkey
+  - location:
+      type: RESOURCE
+      path: /global/stats
+    properties:
+      description: Global platform stats
+  - location:
+      type: RESOURCE
+      path: /global
+    properties:
+      description: Zetadex global resources
+  - location:
+      type: RESOURCE
+      path: "/markets/{market}/stats"
+    properties:
+      description: Markets stats return 24h stats for market specified in path paramter
+  - location:
+      type: RESOURCE
+      path: "/markets/{market}"
+    properties:
+      description: Market to query e.g. 'SOL-USD'
+  - location:
+      type: RESOURCE
+      path: /markets
+    properties:
+      description: Current zetadex market data
+  - location:
+      type: RESPONSE
+      path: "/account/{pubkey}/trades"
+      method: GET
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: "/account/{pubkey}/trades"
+      method: OPTIONS
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: /global/stats/leaderboard
+      method: GET
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: /global/stats/leaderboard
+      method: OPTIONS
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: /global/stats/pnl
+      method: GET
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: /global/stats/pnl
+      method: OPTIONS
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: "/markets/{market}/stats"
+      method: GET
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: "/markets/{market}/stats"
+      method: OPTIONS
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: "/markets/{market}"
+      method: GET
+      statusCode: "200"
+    properties:
+      description: 200 response
+  - location:
+      type: RESPONSE
+      path: "/markets/{market}"
+      method: OPTIONS
+      statusCode: "200"
+    properties:
+      description: 200 response
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+      gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+x-amazon-apigateway-request-validators:
+  Validate query string parameters and headers:
+    validateRequestParameters: true
+    validateRequestBody: false
